@@ -1,0 +1,32 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  @apply bg-[#f5f6fa] text-ink-900 antialiased;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: #d9dce3;
+  border-radius: 8px;
+}
+
+.status-ok {
+  @apply bg-green-100 text-green-700;
+}
+.status-issue {
+  @apply bg-amber-100 text-amber-700;
+}
+.status-down {
+  @apply bg-red-100 text-red-700;
+}
