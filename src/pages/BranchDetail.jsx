@@ -194,13 +194,13 @@ export default function BranchDetail() {
           {branch.camera?.dvrBrand && <p className="text-sm text-slate-500">DVR: {branch.camera.dvrBrand}</p>}
           {branch.camera?.remarks && <p className="text-sm text-slate-500 mt-1">{branch.camera.remarks}</p>}
         </Card>
-        <Card icon={Zap} title="Generator">
+        {/* <Card icon={Zap} title="Generator">
           <p className="text-sm mb-2">Installed: {branch.generator?.installed ? 'Yes' : 'No'}</p>
           <p className="text-sm mb-2">
             Status: <StatusBadge status={branch.generator?.status || 'N/A'} />
           </p>
           {branch.generator?.remarks && <p className="text-sm text-slate-500">{branch.generator.remarks}</p>}
-        </Card>
+        </Card> */}
         <Card icon={Star} title="Google Business">
           <p className="text-sm mb-2">
             Phone: <StatusBadge status={branch.googleBusiness?.phoneNumberStatus || 'Ok'} />

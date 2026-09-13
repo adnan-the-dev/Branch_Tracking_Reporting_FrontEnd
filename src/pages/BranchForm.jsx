@@ -1,22 +1,57 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate, useParams, Link } from 'react-router-dom';
-import { Plus, Trash2, ArrowLeft, Save, MonitorSmartphone, Printer, Wifi, Camera, Zap, Star } from 'lucide-react';
-import api from '../api/client';
+import React, { useEffect, useState } from "react";
+import { useNavigate, useParams, Link } from "react-router-dom";
+import {
+  Plus,
+  Trash2,
+  ArrowLeft,
+  Save,
+  MonitorSmartphone,
+  Printer,
+  Wifi,
+  Camera,
+  Zap,
+  Star,
+} from "lucide-react";
+import api from "../api/client";
 
 const STATION_TYPES = [
-  'Pasta Screen',
-  'Pizza Screen',
-  'Cutting Table Screen',
-  'Dispatch Screen',
-  'Cash Counter Screen',
-  'DineIn Screen',
-  'Other',
+  "Pasta Screen",
+  "Pizza Screen",
+  "Cutting Table Screen",
+  "Dispatch Screen",
+  "Cash Counter Screen",
+  "DineIn Screen",
+  "Manager Screen",
+  "Other",
 ];
-const ISP_OPTIONS = ['Storm Fiber', 'PTCL', 'Nayatel', 'Other'];
+const ISP_OPTIONS = ["Storm Fiber", "PTCL", "Nayatel", "Other"];
 
-const emptyStation = { stationType: 'Pasta Screen', brand: '', model: '', generation: '', ramGb: '', storage: '', status: 'Working', remarks: '' };
-const emptyPrinter = { label: '', brand: '', model: '', connectionType: 'Network', status: 'Working', remarks: '' };
-const emptyConn = { provider: 'Storm Fiber', connectionId: '', purpose: '', status: 'Ok', pendingDues: false, remarks: '' };
+const emptyStation = {
+  stationType: "Pasta Screen",
+  brand: "",
+  model: "",
+  generation: "",
+  ramGb: "",
+  storage: "",
+  status: "Working",
+  remarks: "",
+};
+const emptyPrinter = {
+  label: "",
+  brand: "",
+  model: "",
+  connectionType: "Network",
+  status: "Working",
+  remarks: "",
+};
+const emptyConn = {
+  provider: "Storm Fiber",
+  connectionId: "",
+  purpose: "",
+  status: "Ok",
+  pendingDues: false,
+  remarks: "",
+};
 
 function Section({ icon: Icon, title, children, action }) {
   return (
@@ -36,85 +71,103 @@ function Section({ icon: Icon, title, children, action }) {
 function Field({ label, children }) {
   return (
     <div>
-      <label className="block text-xs font-medium text-slate-500 mb-1">{label}</label>
+      <label className="block text-xs font-medium text-slate-500 mb-1">
+        {label}
+      </label>
       {children}
     </div>
   );
 }
 
 const inputCls =
-  'w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/40 focus:border-brand-500';
+  "w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/40 focus:border-brand-500";
 
 export default function BranchForm() {
   const { id } = useParams();
   const isEdit = !!id;
   const navigate = useNavigate();
 
-  const [name, setName] = useState('');
-  const [address, setAddress] = useState('');
-  const [contactPerson, setContactPerson] = useState('');
-  const [contactPhone, setContactPhone] = useState('');
+  const [name, setName] = useState("");
+  const [address, setAddress] = useState("");
+  const [contactPerson, setContactPerson] = useState("");
+  const [contactPhone, setContactPhone] = useState("");
 
   const [stations, setStations] = useState([{ ...emptyStation }]);
 
-  console.log(stations,'Stations');
-  
-  const [printers, setPrinters] = useState([
-    { ...emptyPrinter, label: 'Cash Counter Printer' },
-    { ...emptyPrinter, label: 'Office Printer' },
-  ]);
-  const [internetConnections, setInternetConnections] = useState([{ ...emptyConn }]);
+  console.log(stations, "Stations");
 
-  const [camera, setCamera] = useState({ recordingStatus: 'Ok', dvrBrand: '', remarks: '' });
-  const [generator, setGenerator] = useState({ installed: false, status: 'N/A', remarks: '' });
+  const [printers, setPrinters] = useState([
+    { ...emptyPrinter, label: "Cash Counter Printer" },
+    { ...emptyPrinter, label: "Office Printer" },
+  ]);
+  const [internetConnections, setInternetConnections] = useState([
+    { ...emptyConn },
+  ]);
+
+  const [camera, setCamera] = useState({
+    recordingStatus: "Ok",
+    dvrBrand: "",
+    remarks: "",
+  });
+  const [generator, setGenerator] = useState({
+    installed: false,
+    status: "N/A",
+    remarks: "",
+  });
   const [googleBusiness, setGoogleBusiness] = useState({
-    phoneNumberStatus: 'Ok',
+    phoneNumberStatus: "Ok",
     locationVerified: true,
-    businessHours: '',
-    remarks: '',
+    businessHours: "",
+    remarks: "",
   });
 
   const [loading, setLoading] = useState(isEdit);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   useEffect(() => {
     if (!isEdit) return;
     api.get(`/branches/${id}`).then(({ data }) => {
       setName(data.name);
-      setAddress(data.address || '');
-      setContactPerson(data.contactPerson || '');
-      setContactPhone(data.contactPhone || '');
+      setAddress(data.address || "");
+      setContactPerson(data.contactPerson || "");
+      setContactPhone(data.contactPhone || "");
       setStations(data.stations.length ? data.stations : [{ ...emptyStation }]);
       setPrinters(data.printers.length ? data.printers : [{ ...emptyPrinter }]);
-      setInternetConnections(data.internetConnections.length ? data.internetConnections : [{ ...emptyConn }]);
+      setInternetConnections(
+        data.internetConnections.length
+          ? data.internetConnections
+          : [{ ...emptyConn }],
+      );
       setCamera({
-        recordingStatus: data.camera?.recordingStatus || 'Ok',
-        dvrBrand: data.camera?.dvrBrand || '',
-        remarks: data.camera?.remarks || '',
+        recordingStatus: data.camera?.recordingStatus || "Ok",
+        dvrBrand: data.camera?.dvrBrand || "",
+        remarks: data.camera?.remarks || "",
       });
       setGenerator({
         installed: data.generator?.installed || false,
-        status: data.generator?.status || 'N/A',
-        remarks: data.generator?.remarks || '',
+        status: data.generator?.status || "N/A",
+        remarks: data.generator?.remarks || "",
       });
       setGoogleBusiness({
-        phoneNumberStatus: data.googleBusiness?.phoneNumberStatus || 'Ok',
+        phoneNumberStatus: data.googleBusiness?.phoneNumberStatus || "Ok",
         locationVerified: data.googleBusiness?.locationVerified ?? true,
-        businessHours: data.googleBusiness?.businessHours || '',
-        remarks: data.googleBusiness?.remarks || '',
+        businessHours: data.googleBusiness?.businessHours || "",
+        remarks: data.googleBusiness?.remarks || "",
       });
       setLoading(false);
     });
   }, [id, isEdit]);
 
   const updateArrItem = (setter, idx, key, value) =>
-    setter((arr) => arr.map((item, i) => (i === idx ? { ...item, [key]: value } : item)));
+    setter((arr) =>
+      arr.map((item, i) => (i === idx ? { ...item, [key]: value } : item)),
+    );
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSaving(true);
-    setError('');
+    setError("");
     const payload = {
       name,
       address,
@@ -131,11 +184,11 @@ export default function BranchForm() {
       if (isEdit) {
         await api.put(`/branches/${id}`, payload);
       } else {
-        await api.post('/branches', payload);
+        await api.post("/branches", payload);
       }
-      navigate('/branches');
+      navigate("/branches");
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to save branch');
+      setError(err.response?.data?.message || "Failed to save branch");
     } finally {
       setSaving(false);
     }
@@ -150,27 +203,53 @@ export default function BranchForm() {
           <ArrowLeft size={18} />
         </Link>
         <div>
-          <h1 className="text-2xl font-bold text-ink-900">{isEdit ? 'Edit Branch' : 'Add Branch'}</h1>
-          <p className="text-slate-500 text-sm">Enter every system installed at this branch</p>
+          <h1 className="text-2xl font-bold text-ink-900">
+            {isEdit ? "Edit Branch" : "Add Branch"}
+          </h1>
+          <p className="text-slate-500 text-sm">
+            Enter every system installed at this branch
+          </p>
         </div>
       </div>
 
-      {error && <div className="bg-red-50 text-red-600 text-sm px-4 py-3 rounded-xl">{error}</div>}
+      {error && (
+        <div className="bg-red-50 text-red-600 text-sm px-4 py-3 rounded-xl">
+          {error}
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <Section icon={MonitorSmartphone} title="Branch Details">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Field label="Branch Name *">
-              <input required value={name} onChange={(e) => setName(e.target.value)} className={inputCls} placeholder="e.g. Gulberg" />
+              <input
+                required
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className={inputCls}
+                placeholder="e.g. Gulberg"
+              />
             </Field>
             <Field label="Address">
-              <input value={address} onChange={(e) => setAddress(e.target.value)} className={inputCls} />
+              <input
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                className={inputCls}
+              />
             </Field>
             <Field label="Branch RM">
-              <input value={contactPerson} onChange={(e) => setContactPerson(e.target.value)} className={inputCls} />
+              <input
+                value={contactPerson}
+                onChange={(e) => setContactPerson(e.target.value)}
+                className={inputCls}
+              />
             </Field>
             <Field label="Branch Contact">
-              <input value={contactPhone} onChange={(e) => setContactPhone(e.target.value)} className={inputCls} />
+              <input
+                value={contactPhone}
+                onChange={(e) => setContactPhone(e.target.value)}
+                className={inputCls}
+              />
             </Field>
           </div>
         </Section>
@@ -178,23 +257,33 @@ export default function BranchForm() {
         <Section
           icon={MonitorSmartphone}
           title="POS / Kitchen Stations"
-          action={
-            <button
-              type="button"
-              onClick={() => setStations((s) => [...s, { ...emptyStation }])}
-              className="flex items-center gap-1 text-sm font-semibold text-brand-600 hover:text-brand-700"
-            >
-              <Plus size={15} /> Add Station
-            </button>
-          }
+          // action={
+          //   <button
+          //     type="button"
+          //     onClick={() => setStations((s) => [...s, { ...emptyStation }])}
+          //     className="flex items-center gap-1 text-sm font-semibold text-brand-600 hover:text-brand-700"
+          //   >
+          //     <Plus size={15} /> Add Station
+          //   </button>
+          // }
         >
           <div className="space-y-4">
             {stations.map((s, idx) => (
-              <div key={idx} className="border border-slate-200 rounded-xl p-4 grid grid-cols-1 md:grid-cols-7 gap-3 relative">
+              <div
+                key={idx}
+                className="border border-slate-200 rounded-xl p-4 grid grid-cols-1 md:grid-cols-7 gap-3 relative"
+              >
                 <Field label="Station Type">
                   <select
                     value={s.stationType}
-                    onChange={(e) => updateArrItem(setStations, idx, 'stationType', e.target.value)}
+                    onChange={(e) =>
+                      updateArrItem(
+                        setStations,
+                        idx,
+                        "stationType",
+                        e.target.value,
+                      )
+                    }
                     className={inputCls}
                   >
                     {STATION_TYPES.map((t) => (
@@ -203,15 +292,35 @@ export default function BranchForm() {
                   </select>
                 </Field>
                 <Field label="Brand">
-                  <input value={s.brand} onChange={(e) => updateArrItem(setStations, idx, 'brand', e.target.value)} className={inputCls} placeholder="Dell / HP" />
+                  <input
+                    value={s.brand}
+                    onChange={(e) =>
+                      updateArrItem(setStations, idx, "brand", e.target.value)
+                    }
+                    className={inputCls}
+                    placeholder="Dell / HP"
+                  />
                 </Field>
                 <Field label="Model">
-                  <input value={s.model} onChange={(e) => updateArrItem(setStations, idx, 'model', e.target.value)} className={inputCls} />
+                  <input
+                    value={s.model}
+                    onChange={(e) =>
+                      updateArrItem(setStations, idx, "model", e.target.value)
+                    }
+                    className={inputCls}
+                  />
                 </Field>
                 <Field label="Generation">
                   <input
                     value={s.generation}
-                    onChange={(e) => updateArrItem(setStations, idx, 'generation', e.target.value)}
+                    onChange={(e) =>
+                      updateArrItem(
+                        setStations,
+                        idx,
+                        "generation",
+                        e.target.value,
+                      )
+                    }
                     className={inputCls}
                     placeholder="i5 8th Gen"
                   />
@@ -220,7 +329,9 @@ export default function BranchForm() {
                   <input
                     type="text"
                     value={s.ramGb}
-                    onChange={(e) => updateArrItem(setStations, idx, 'ramGb', e.target.value)}
+                    onChange={(e) =>
+                      updateArrItem(setStations, idx, "ramGb", e.target.value)
+                    }
                     className={inputCls}
                   />
                 </Field>
@@ -228,12 +339,20 @@ export default function BranchForm() {
                   <input
                     type="text"
                     value={s.storage}
-                    onChange={(e) => updateArrItem(setStations, idx, 'storage', e.target.value)}
+                    onChange={(e) =>
+                      updateArrItem(setStations, idx, "storage", e.target.value)
+                    }
                     className={inputCls}
                   />
                 </Field>
                 <Field label="Status">
-                  <select value={s.status} onChange={(e) => updateArrItem(setStations, idx, 'status', e.target.value)} className={inputCls}>
+                  <select
+                    value={s.status}
+                    onChange={(e) =>
+                      updateArrItem(setStations, idx, "status", e.target.value)
+                    }
+                    className={inputCls}
+                  >
                     <option>Working</option>
                     <option>Issue</option>
                     <option>Down</option>
@@ -243,7 +362,14 @@ export default function BranchForm() {
                   <Field label="Remarks">
                     <input
                       value={s.remarks}
-                      onChange={(e) => updateArrItem(setStations, idx, 'remarks', e.target.value)}
+                      onChange={(e) =>
+                        updateArrItem(
+                          setStations,
+                          idx,
+                          "remarks",
+                          e.target.value,
+                        )
+                      }
                       className={inputCls}
                     />
                   </Field>
@@ -251,7 +377,9 @@ export default function BranchForm() {
                 <div className="flex items-end justify-end">
                   <button
                     type="button"
-                    onClick={() => setStations((arr) => arr.filter((_, i) => i !== idx))}
+                    onClick={() =>
+                      setStations((arr) => arr.filter((_, i) => i !== idx))
+                    }
                     className="text-red-500 hover:text-red-700 p-2"
                   >
                     <Trash2 size={16} />
@@ -260,40 +388,73 @@ export default function BranchForm() {
               </div>
             ))}
           </div>
+
+          <div className="mt-3 border-slate-200 pt-3 flex justify-end">
+            <button
+              type="button"
+              onClick={() => setStations((s) => [...s, { ...emptyStation }])}
+              className="flex items-center gap-1 text-sm font-semibold text-brand-600 hover:text-brand-700"
+            >
+              <Plus size={15} /> Add Station
+            </button>
+          </div>
         </Section>
 
         <Section
           icon={Printer}
           title="Printers"
-          action={
-            <button
-              type="button"
-              onClick={() => setPrinters((p) => [...p, { ...emptyPrinter }])}
-              className="flex items-center gap-1 text-sm font-semibold text-brand-600 hover:text-brand-700"
-            >
-              <Plus size={15} /> Add Printer
-            </button>
-          }
+          // action={
+          //   <button
+          //     type="button"
+          //     onClick={() => setPrinters((p) => [...p, { ...emptyPrinter }])}
+          //     className="flex items-center gap-1 text-sm font-semibold text-brand-600 hover:text-brand-700"
+          //   >
+          //     <Plus size={15} /> Add Printer
+          //   </button>
+          // }
         >
           <div className="space-y-4">
             {printers.map((p, idx) => (
-              <div key={idx} className="border border-slate-200 rounded-xl p-4 grid grid-cols-1 md:grid-cols-5 gap-3">
+              <div
+                key={idx}
+                className="border border-slate-200 rounded-xl p-4 grid grid-cols-1 md:grid-cols-5 gap-3"
+              >
                 <Field label="Label">
                   <input
                     value={p.label}
-                    onChange={(e) => updateArrItem(setPrinters, idx, 'label', e.target.value)}
+                    onChange={(e) =>
+                      updateArrItem(setPrinters, idx, "label", e.target.value)
+                    }
                     className={inputCls}
                     placeholder="Cash Counter Printer"
                   />
                 </Field>
                 <Field label="Brand">
-                  <input value={p.brand} onChange={(e) => updateArrItem(setPrinters, idx, 'brand', e.target.value)} className={inputCls} />
+                  <input
+                    value={p.brand}
+                    onChange={(e) =>
+                      updateArrItem(setPrinters, idx, "brand", e.target.value)
+                    }
+                    className={inputCls}
+                  />
                 </Field>
                 <Field label="Model">
-                  <input value={p.model} onChange={(e) => updateArrItem(setPrinters, idx, 'model', e.target.value)} className={inputCls} />
+                  <input
+                    value={p.model}
+                    onChange={(e) =>
+                      updateArrItem(setPrinters, idx, "model", e.target.value)
+                    }
+                    className={inputCls}
+                  />
                 </Field>
                 <Field label="Status">
-                  <select value={p.status} onChange={(e) => updateArrItem(setPrinters, idx, 'status', e.target.value)} className={inputCls}>
+                  <select
+                    value={p.status}
+                    onChange={(e) =>
+                      updateArrItem(setPrinters, idx, "status", e.target.value)
+                    }
+                    className={inputCls}
+                  >
                     <option>Working</option>
                     <option>Issue</option>
                     <option>Down</option>
@@ -302,7 +463,9 @@ export default function BranchForm() {
                 <div className="flex items-end justify-end">
                   <button
                     type="button"
-                    onClick={() => setPrinters((arr) => arr.filter((_, i) => i !== idx))}
+                    onClick={() =>
+                      setPrinters((arr) => arr.filter((_, i) => i !== idx))
+                    }
                     className="text-red-500 hover:text-red-700 p-2"
                   >
                     <Trash2 size={16} />
@@ -311,26 +474,52 @@ export default function BranchForm() {
               </div>
             ))}
           </div>
+
+          <div className="mt-3 border-slate-200 pt-3 flex justify-end">
+            <button
+              type="button"
+              onClick={() => setPrinters((p) => [...p, { ...emptyPrinter }])}
+              className="flex items-center gap-1 text-sm font-semibold text-brand-600 hover:text-brand-700"
+            >
+              <Plus size={15} /> Add Printer
+            </button>
+          </div>
         </Section>
 
         <Section
           icon={Wifi}
           title="Internet Connections"
-          action={
-            <button
-              type="button"
-              onClick={() => setInternetConnections((c) => [...c, { ...emptyConn }])}
-              className="flex items-center gap-1 text-sm font-semibold text-brand-600 hover:text-brand-700"
-            >
-              <Plus size={15} /> Add Connection
-            </button>
-          }
+          // action={
+          //   <button
+          //     type="button"
+          //     onClick={() =>
+          //       setInternetConnections((c) => [...c, { ...emptyConn }])
+          //     }
+          //     className="flex items-center gap-1 text-sm font-semibold text-brand-600 hover:text-brand-700"
+          //   >
+          //     <Plus size={15} /> Add Connection
+          //   </button>
+          // }
         >
           <div className="space-y-4">
             {internetConnections.map((c, idx) => (
-              <div key={idx} className="border border-slate-200 rounded-xl p-4 grid grid-cols-1 md:grid-cols-6 gap-3">
+              <div
+                key={idx}
+                className="border border-slate-200 rounded-xl p-4 grid grid-cols-1 md:grid-cols-6 gap-3"
+              >
                 <Field label="Provider (ISP)">
-                  <select value={c.provider} onChange={(e) => updateArrItem(setInternetConnections, idx, 'provider', e.target.value)} className={inputCls}>
+                  <select
+                    value={c.provider}
+                    onChange={(e) =>
+                      updateArrItem(
+                        setInternetConnections,
+                        idx,
+                        "provider",
+                        e.target.value,
+                      )
+                    }
+                    className={inputCls}
+                  >
                     {ISP_OPTIONS.map((o) => (
                       <option key={o}>{o}</option>
                     ))}
@@ -339,20 +528,45 @@ export default function BranchForm() {
                 <Field label="Connection ID">
                   <input
                     value={c.connectionId}
-                    onChange={(e) => updateArrItem(setInternetConnections, idx, 'connectionId', e.target.value)}
+                    onChange={(e) =>
+                      updateArrItem(
+                        setInternetConnections,
+                        idx,
+                        "connectionId",
+                        e.target.value,
+                      )
+                    }
                     className={inputCls}
                   />
                 </Field>
                 <Field label="Purpose">
                   <input
                     value={c.purpose}
-                    onChange={(e) => updateArrItem(setInternetConnections, idx, 'purpose', e.target.value)}
+                    onChange={(e) =>
+                      updateArrItem(
+                        setInternetConnections,
+                        idx,
+                        "purpose",
+                        e.target.value,
+                      )
+                    }
                     className={inputCls}
                     placeholder="POS / CCTV / WiFi"
                   />
                 </Field>
                 <Field label="Status">
-                  <select value={c.status} onChange={(e) => updateArrItem(setInternetConnections, idx, 'status', e.target.value)} className={inputCls}>
+                  <select
+                    value={c.status}
+                    onChange={(e) =>
+                      updateArrItem(
+                        setInternetConnections,
+                        idx,
+                        "status",
+                        e.target.value,
+                      )
+                    }
+                    className={inputCls}
+                  >
                     <option>Ok</option>
                     <option>Issue</option>
                     <option>Down</option>
@@ -360,8 +574,15 @@ export default function BranchForm() {
                 </Field>
                 <Field label="Pending Dues">
                   <select
-                    value={c.pendingDues ? 'yes' : 'no'}
-                    onChange={(e) => updateArrItem(setInternetConnections, idx, 'pendingDues', e.target.value === 'yes')}
+                    value={c.pendingDues ? "yes" : "no"}
+                    onChange={(e) =>
+                      updateArrItem(
+                        setInternetConnections,
+                        idx,
+                        "pendingDues",
+                        e.target.value === "yes",
+                      )
+                    }
                     className={inputCls}
                   >
                     <option value="no">No</option>
@@ -371,7 +592,11 @@ export default function BranchForm() {
                 <div className="flex items-end justify-end">
                   <button
                     type="button"
-                    onClick={() => setInternetConnections((arr) => arr.filter((_, i) => i !== idx))}
+                    onClick={() =>
+                      setInternetConnections((arr) =>
+                        arr.filter((_, i) => i !== idx),
+                      )
+                    }
                     className="text-red-500 hover:text-red-700 p-2"
                   >
                     <Trash2 size={16} />
@@ -379,6 +604,17 @@ export default function BranchForm() {
                 </div>
               </div>
             ))}
+          </div>
+          <div className="mt-3 border-slate-200 pt-3 flex justify-end">
+            <button
+             type="button"
+              onClick={() =>
+                setInternetConnections((c) => [...c, { ...emptyConn }])
+              }
+              className="flex items-center gap-1 text-sm font-semibold text-brand-600 hover:text-brand-700"
+            >
+              <Plus size={15} /> Add Connection
+            </button>
           </div>
         </Section>
 
@@ -388,7 +624,9 @@ export default function BranchForm() {
               <Field label="Recording Status">
                 <select
                   value={camera.recordingStatus}
-                  onChange={(e) => setCamera({ ...camera, recordingStatus: e.target.value })}
+                  onChange={(e) =>
+                    setCamera({ ...camera, recordingStatus: e.target.value })
+                  }
                   className={inputCls}
                 >
                   <option>Ok</option>
@@ -397,10 +635,23 @@ export default function BranchForm() {
                 </select>
               </Field>
               <Field label="DVR Brand">
-                <input value={camera.dvrBrand} onChange={(e) => setCamera({ ...camera, dvrBrand: e.target.value })} className={inputCls} />
+                <input
+                  value={camera.dvrBrand}
+                  onChange={(e) =>
+                    setCamera({ ...camera, dvrBrand: e.target.value })
+                  }
+                  className={inputCls}
+                />
               </Field>
               <Field label="Remarks">
-                <input value={camera.remarks} onChange={(e) => setCamera({ ...camera, remarks: e.target.value })} className={inputCls} placeholder="e.g. DinIn Camera Off" />
+                <input
+                  value={camera.remarks}
+                  onChange={(e) =>
+                    setCamera({ ...camera, remarks: e.target.value })
+                  }
+                  className={inputCls}
+                  placeholder="e.g. DinIn Camera Off"
+                />
               </Field>
             </div>
           </Section>
@@ -435,7 +686,12 @@ export default function BranchForm() {
               <Field label="Phone Number Status">
                 <select
                   value={googleBusiness.phoneNumberStatus}
-                  onChange={(e) => setGoogleBusiness({ ...googleBusiness, phoneNumberStatus: e.target.value })}
+                  onChange={(e) =>
+                    setGoogleBusiness({
+                      ...googleBusiness,
+                      phoneNumberStatus: e.target.value,
+                    })
+                  }
                   className={inputCls}
                 >
                   <option>Ok</option>
@@ -445,8 +701,13 @@ export default function BranchForm() {
               </Field>
               <Field label="Location Verified">
                 <select
-                  value={googleBusiness.locationVerified ? 'yes' : 'no'}
-                  onChange={(e) => setGoogleBusiness({ ...googleBusiness, locationVerified: e.target.value === 'yes' })}
+                  value={googleBusiness.locationVerified ? "yes" : "no"}
+                  onChange={(e) =>
+                    setGoogleBusiness({
+                      ...googleBusiness,
+                      locationVerified: e.target.value === "yes",
+                    })
+                  }
                   className={inputCls}
                 >
                   <option value="yes">Yes</option>
@@ -456,7 +717,12 @@ export default function BranchForm() {
               <Field label="Business Hours">
                 <input
                   value={googleBusiness.businessHours}
-                  onChange={(e) => setGoogleBusiness({ ...googleBusiness, businessHours: e.target.value })}
+                  onChange={(e) =>
+                    setGoogleBusiness({
+                      ...googleBusiness,
+                      businessHours: e.target.value,
+                    })
+                  }
                   className={inputCls}
                   placeholder="11Am-3Am"
                 />
@@ -466,7 +732,10 @@ export default function BranchForm() {
         </div>
 
         <div className="flex justify-end gap-3">
-          <Link to="/branches" className="px-5 py-2.5 rounded-xl text-sm font-semibold text-slate-500 hover:bg-slate-200/60">
+          <Link
+            to="/branches"
+            className="px-5 py-2.5 rounded-xl text-sm font-semibold text-slate-500 hover:bg-slate-200/60"
+          >
             Cancel
           </Link>
           <button
@@ -474,7 +743,7 @@ export default function BranchForm() {
             disabled={saving}
             className="flex items-center gap-2 bg-brand-500 hover:bg-brand-600 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors disabled:opacity-60"
           >
-            <Save size={16} /> {saving ? 'Saving...' : 'Save Branch'}
+            <Save size={16} /> {saving ? "Saving..." : "Save Branch"}
           </button>
         </div>
       </form>
