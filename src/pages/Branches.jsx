@@ -1,32 +1,44 @@
-import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Plus, Store, MonitorSmartphone, Printer, Wifi, Search } from 'lucide-react';
-import api from '../api/client';
-import StatusBadge from '../components/StatusBadge.jsx';
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import {
+  Plus,
+  Store,
+  MonitorSmartphone,
+  Printer,
+  Wifi,
+  Search,
+  Copy,
+} from "lucide-react";
+import api from "../api/client";
+import StatusBadge from "../components/StatusBadge.jsx";
 
 export default function Branches() {
   const [branches, setBranches] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [q, setQ] = useState('');
+  const [q, setQ] = useState("");
 
   const load = () => {
     setLoading(true);
     api
-      .get('/branches')
+      .get("/branches")
       .then(({ data }) => setBranches(data))
       .finally(() => setLoading(false));
   };
 
   useEffect(load, []);
 
-  const filtered = branches.filter((b) => b.name.toLowerCase().includes(q.toLowerCase()));
+  const filtered = branches.filter((b) =>
+    b.name.toLowerCase().includes(q.toLowerCase()),
+  );
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-ink-900">Branches</h1>
-          <p className="text-slate-500 text-sm mt-1">Manage systems for every branch</p>
+          <p className="text-slate-500 text-sm mt-1">
+            Manage systems for every branch
+          </p>
         </div>
         <Link
           to="/branches/new"
@@ -37,7 +49,10 @@ export default function Branches() {
       </div>
 
       <div className="relative max-w-sm">
-        <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+        <Search
+          size={16}
+          className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+        />
         <input
           value={q}
           onChange={(e) => setQ(e.target.value)}
@@ -61,17 +76,57 @@ export default function Branches() {
               to={`/branches/${b._id}`}
               className="bg-white rounded-2xl shadow-card p-5 hover:shadow-soft transition-shadow"
             >
-              <div className="flex items-start justify-between mb-3">
+              {/* <div className="flex items-start justify-between mb-3">
                 <div>
                   <h3 className="font-semibold text-ink-900">{b.name}</h3>
-                  {b.address && <p className="text-xs text-slate-400 mt-0.5">{b.address}</p>}
+                  {b.address && (
+                    <p className="text-xs text-slate-400 mt-0.5">{b.address}</p>
+                  )}
                 </div>
-                <StatusBadge status={b.camera?.recordingStatus || 'Ok'} />
-              </div>
+                <StatusBadge status={b.camera?.recordingStatus || "Ok"} />
+                <Link to={`/branches/${b._id}/copy`} className="...">
+                  <Copy size={15} />
+                </Link>
+              </div> */}
 
+<div className="flex items-start justify-between gap-3 mb-3">
+  <div className="min-w-0">
+    <h3 className="font-semibold text-ink-900 truncate">
+      {b.name}
+    </h3>
+
+    {b.address && (
+      <p className="text-xs text-slate-400 mt-0.5 truncate">
+        {b.address}
+      </p>
+    )}
+  </div>
+
+  <div className="flex items-center gap-2 shrink-0">
+    <StatusBadge
+      status={b.camera?.recordingStatus || "Ok"}
+    />
+
+    <Link
+      to={`/branches/${b._id}/copy`}
+      title="Copy Branch"
+      className="inline-flex items-center justify-center w-8 h-8 rounded-lg
+                 border border-slate-200 bg-white
+                 text-slate-500
+                 hover:text-brand-600 hover:border-brand-200
+                 hover:bg-brand-50
+                 transition-all duration-200"
+    >
+      <Copy size={15} />
+    </Link>
+  </div>
+</div>
               <div className="grid grid-cols-3 gap-2 text-center">
                 <div className="bg-slate-50 rounded-xl py-2">
-                  <MonitorSmartphone size={16} className="mx-auto mb-1 text-blue-500" />
+                  <MonitorSmartphone
+                    size={16}
+                    className="mx-auto mb-1 text-blue-500"
+                  />
                   <p className="text-sm font-bold">{b.stations?.length || 0}</p>
                   <p className="text-[10px] text-slate-400">Stations</p>
                 </div>
@@ -82,7 +137,9 @@ export default function Branches() {
                 </div>
                 <div className="bg-slate-50 rounded-xl py-2">
                   <Wifi size={16} className="mx-auto mb-1 text-teal-500" />
-                  <p className="text-sm font-bold">{b.internetConnections?.length || 0}</p>
+                  <p className="text-sm font-bold">
+                    {b.internetConnections?.length || 0}
+                  </p>
                   <p className="text-[10px] text-slate-400">Internet</p>
                 </div>
               </div>

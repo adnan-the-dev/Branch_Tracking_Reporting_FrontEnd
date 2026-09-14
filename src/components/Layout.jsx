@@ -7,12 +7,14 @@ import {
   Settings as SettingsIcon,
   LogOut,
   UtensilsCrossed,
+  ScreenShare,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.jsx';
 
 const navItems = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard, end: true },
   { to: '/branches', label: 'Branches', icon: Store },
+  { to: '/display', label: 'Display', icon: ScreenShare },
   { to: '/reports', label: 'Daily Reports', icon: FileClock },
   { to: '/settings', label: 'Settings', icon: SettingsIcon },
 ];

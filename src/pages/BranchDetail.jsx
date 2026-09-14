@@ -1,8 +1,19 @@
-import React, { useEffect, useState } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Pencil, Trash2, MonitorSmartphone, Printer, Wifi, Camera, Zap, Star } from 'lucide-react';
-import api from '../api/client';
-import StatusBadge from '../components/StatusBadge.jsx';
+import React, { useEffect, useState } from "react";
+import { useParams, Link, useNavigate } from "react-router-dom";
+import {
+  ArrowLeft,
+  Pencil,
+  Trash2,
+  MonitorSmartphone,
+  Printer,
+  Wifi,
+  Camera,
+  Zap,
+  Star,
+  Copy,
+} from "lucide-react";
+import api from "../api/client";
+import StatusBadge from "../components/StatusBadge.jsx";
 
 function Card({ icon: Icon, title, children }) {
   return (
@@ -30,9 +41,12 @@ export default function BranchDetail() {
   }, [id]);
 
   const handleDelete = async () => {
-    if (!window.confirm(`Delete branch "${branch.name}"? This cannot be undone.`)) return;
+    if (
+      !window.confirm(`Delete branch "${branch.name}"? This cannot be undone.`)
+    )
+      return;
     await api.delete(`/branches/${id}`);
-    navigate('/branches');
+    navigate("/branches");
   };
 
   if (loading) return <p className="text-slate-400">Loading...</p>;
@@ -47,10 +61,13 @@ export default function BranchDetail() {
           </Link>
           <div>
             <h1 className="text-2xl font-bold text-ink-900">{branch.name}</h1>
-            {branch.address && <p className="text-slate-500 text-sm">{branch.address}</p>}
+            {branch.address && (
+              <p className="text-slate-500 text-sm">{branch.address}</p>
+            )}
           </div>
         </div>
         <div className="flex gap-2">
+         
           <Link
             to={`/branches/${id}/edit`}
             className="flex items-center gap-2 bg-white border border-slate-200 hover:bg-slate-50 text-ink-700 text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors"
@@ -83,7 +100,10 @@ export default function BranchDetail() {
         </div>
       )}
 
-      <Card icon={MonitorSmartphone} title={`POS / Kitchen Stations (${branch.stations.length})`}>
+      <Card
+        icon={MonitorSmartphone}
+        title={`POS / Kitchen Stations (${branch.stations.length})`}
+      >
         {branch.stations.length === 0 ? (
           <p className="text-sm text-slate-400">No stations recorded.</p>
         ) : (
@@ -104,16 +124,22 @@ export default function BranchDetail() {
               <tbody>
                 {branch.stations.map((s) => (
                   <tr key={s._id} className="border-b border-slate-50">
-                    <td className="py-2 pr-4 font-medium text-ink-800">{s.stationType}</td>
-                    <td className="py-2 pr-4">{s.brand || '-'}</td>
-                    <td className="py-2 pr-4">{s.model || '-'}</td>
-                    <td className="py-2 pr-4">{s.generation || '-'}</td>
-                    <td className="py-2 pr-4">{s.ramGb ? `${s.ramGb} GB` : '-'}</td>
-                    <td className="py-2 pr-4">{s.storage ? `${s.storage} GB` : '-'}</td>
+                    <td className="py-2 pr-4 font-medium text-ink-800">
+                      {s.stationType}
+                    </td>
+                    <td className="py-2 pr-4">{s.brand || "-"}</td>
+                    <td className="py-2 pr-4">{s.model || "-"}</td>
+                    <td className="py-2 pr-4">{s.generation || "-"}</td>
+                    <td className="py-2 pr-4">
+                      {s.ramGb ? `${s.ramGb} GB` : "-"}
+                    </td>
+                    <td className="py-2 pr-4">
+                      {s.storage ? `${s.storage} GB` : "-"}
+                    </td>
                     <td className="py-2 pr-4">
                       <StatusBadge status={s.status} />
                     </td>
-                    <td className="py-2 text-slate-500">{s.remarks || '-'}</td>
+                    <td className="py-2 text-slate-500">{s.remarks || "-"}</td>
                   </tr>
                 ))}
               </tbody>
@@ -139,9 +165,11 @@ export default function BranchDetail() {
               <tbody>
                 {branch.printers.map((p) => (
                   <tr key={p._id} className="border-b border-slate-50">
-                    <td className="py-2 pr-4 font-medium text-ink-800">{p.label}</td>
-                    <td className="py-2 pr-4">{p.brand || '-'}</td>
-                    <td className="py-2 pr-4">{p.model || '-'}</td>
+                    <td className="py-2 pr-4 font-medium text-ink-800">
+                      {p.label}
+                    </td>
+                    <td className="py-2 pr-4">{p.brand || "-"}</td>
+                    <td className="py-2 pr-4">{p.model || "-"}</td>
                     <td className="py-2">
                       <StatusBadge status={p.status} />
                     </td>
@@ -153,9 +181,14 @@ export default function BranchDetail() {
         )}
       </Card>
 
-      <Card icon={Wifi} title={`Internet Connections (${branch.internetConnections.length})`}>
+      <Card
+        icon={Wifi}
+        title={`Internet Connections (${branch.internetConnections.length})`}
+      >
         {branch.internetConnections.length === 0 ? (
-          <p className="text-sm text-slate-400">No internet connections recorded.</p>
+          <p className="text-sm text-slate-400">
+            No internet connections recorded.
+          </p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
@@ -171,13 +204,15 @@ export default function BranchDetail() {
               <tbody>
                 {branch.internetConnections.map((c) => (
                   <tr key={c._id} className="border-b border-slate-50">
-                    <td className="py-2 pr-4 font-medium text-ink-800">{c.provider}</td>
-                    <td className="py-2 pr-4">{c.connectionId || '-'}</td>
-                    <td className="py-2 pr-4">{c.purpose || '-'}</td>
+                    <td className="py-2 pr-4 font-medium text-ink-800">
+                      {c.provider}
+                    </td>
+                    <td className="py-2 pr-4">{c.connectionId || "-"}</td>
+                    <td className="py-2 pr-4">{c.purpose || "-"}</td>
                     <td className="py-2 pr-4">
                       <StatusBadge status={c.status} />
                     </td>
-                    <td className="py-2">{c.pendingDues ? 'Yes' : 'No'}</td>
+                    <td className="py-2">{c.pendingDues ? "Yes" : "No"}</td>
                   </tr>
                 ))}
               </tbody>
@@ -189,25 +224,35 @@ export default function BranchDetail() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card icon={Camera} title="Camera / DVR">
           <p className="text-sm mb-2">
-            Status: <StatusBadge status={branch.camera?.recordingStatus || 'Ok'} />
+            Status:{" "}
+            <StatusBadge status={branch.camera?.recordingStatus || "Ok"} />
           </p>
-          {branch.camera?.dvrBrand && <p className="text-sm text-slate-500">DVR: {branch.camera.dvrBrand}</p>}
-          {branch.camera?.remarks && <p className="text-sm text-slate-500 mt-1">{branch.camera.remarks}</p>}
+          {branch.camera?.dvrBrand && (
+            <p className="text-sm text-slate-500">
+              DVR: {branch.camera.dvrBrand}
+            </p>
+          )}
+          {branch.camera?.remarks && (
+            <p className="text-sm text-slate-500 mt-1">
+              {branch.camera.remarks}
+            </p>
+          )}
         </Card>
-        {/* <Card icon={Zap} title="Generator">
-          <p className="text-sm mb-2">Installed: {branch.generator?.installed ? 'Yes' : 'No'}</p>
-          <p className="text-sm mb-2">
-            Status: <StatusBadge status={branch.generator?.status || 'N/A'} />
-          </p>
-          {branch.generator?.remarks && <p className="text-sm text-slate-500">{branch.generator.remarks}</p>}
-        </Card> */}
         <Card icon={Star} title="Google Business">
           <p className="text-sm mb-2">
-            Phone: <StatusBadge status={branch.googleBusiness?.phoneNumberStatus || 'Ok'} />
+            Phone:{" "}
+            <StatusBadge
+              status={branch.googleBusiness?.phoneNumberStatus || "Ok"}
+            />
           </p>
-          <p className="text-sm mb-2">Location Verified: {branch.googleBusiness?.locationVerified ? 'Yes' : 'No'}</p>
+          <p className="text-sm mb-2">
+            Location Verified:{" "}
+            {branch.googleBusiness?.locationVerified ? "Yes" : "No"}
+          </p>
           {branch.googleBusiness?.businessHours && (
-            <p className="text-sm text-slate-500">Hours: {branch.googleBusiness.businessHours}</p>
+            <p className="text-sm text-slate-500">
+              Hours: {branch.googleBusiness.businessHours}
+            </p>
           )}
         </Card>
       </div>

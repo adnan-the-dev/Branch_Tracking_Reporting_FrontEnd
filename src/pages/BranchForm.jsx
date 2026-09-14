@@ -22,6 +22,7 @@ const STATION_TYPES = [
   "Cash Counter Screen",
   "DineIn Screen",
   "Manager Screen",
+  "DineIn Screen",
   "Other",
 ];
 const ISP_OPTIONS = ["Storm Fiber", "PTCL", "Nayatel", "Other"];
@@ -83,8 +84,14 @@ const inputCls =
   "w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/40 focus:border-brand-500";
 
 export default function BranchForm() {
+  // const { id } = useParams();
+  // const isEdit = !!id;
+
   const { id } = useParams();
-  const isEdit = !!id;
+
+  const isCopy = window.location.pathname.endsWith("/copy");
+  const isEdit = !!id && !isCopy;
+
   const navigate = useNavigate();
 
   const [name, setName] = useState("");
@@ -125,39 +132,102 @@ export default function BranchForm() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
+  // useEffect(() => {
+  //   if (!isEdit) return;
+  //   api.get(`/branches/${id}`).then(({ data }) => {
+  //     setName(data.name);
+  //     setAddress(data.address || "");
+  //     setContactPerson(data.contactPerson || "");
+  //     setContactPhone(data.contactPhone || "");
+  //     setStations(data.stations.length ? data.stations : [{ ...emptyStation }]);
+  //     setPrinters(data.printers.length ? data.printers : [{ ...emptyPrinter }]);
+  //     setInternetConnections(
+  //       data.internetConnections.length
+  //         ? data.internetConnections
+  //         : [{ ...emptyConn }],
+  //     );
+  //     setCamera({
+  //       recordingStatus: data.camera?.recordingStatus || "Ok",
+  //       dvrBrand: data.camera?.dvrBrand || "",
+  //       remarks: data.camera?.remarks || "",
+  //     });
+  //     setGenerator({
+  //       installed: data.generator?.installed || false,
+  //       status: data.generator?.status || "N/A",
+  //       remarks: data.generator?.remarks || "",
+  //     });
+  //     setGoogleBusiness({
+  //       phoneNumberStatus: data.googleBusiness?.phoneNumberStatus || "Ok",
+  //       locationVerified: data.googleBusiness?.locationVerified ?? true,
+  //       businessHours: data.googleBusiness?.businessHours || "",
+  //       remarks: data.googleBusiness?.remarks || "",
+  //     });
+  //     setLoading(false);
+  //   });
+  // }, [id, isEdit]);
+
   useEffect(() => {
-    if (!isEdit) return;
-    api.get(`/branches/${id}`).then(({ data }) => {
-      setName(data.name);
-      setAddress(data.address || "");
-      setContactPerson(data.contactPerson || "");
-      setContactPhone(data.contactPhone || "");
-      setStations(data.stations.length ? data.stations : [{ ...emptyStation }]);
-      setPrinters(data.printers.length ? data.printers : [{ ...emptyPrinter }]);
-      setInternetConnections(
-        data.internetConnections.length
-          ? data.internetConnections
-          : [{ ...emptyConn }],
-      );
-      setCamera({
-        recordingStatus: data.camera?.recordingStatus || "Ok",
-        dvrBrand: data.camera?.dvrBrand || "",
-        remarks: data.camera?.remarks || "",
+    if (!id) return;
+
+    api
+      .get(`/branches/${id}`)
+      .then(({ data }) => {
+        setName(isCopy ? `${data.name} - Copy` : data.name);
+        setAddress(data.address || "");
+        setContactPerson(data.contactPerson || "");
+        setContactPhone(data.contactPhone || "");
+
+        // Remove MongoDB IDs from copied items
+        setStations(
+          data.stations?.length
+            ? data.stations.map(({ _id, ...station }) => ({
+                ...station,
+              }))
+            : [{ ...emptyStation }],
+        );
+
+        setPrinters(
+          data.printers?.length
+            ? data.printers.map(({ _id, ...printer }) => ({
+                ...printer,
+              }))
+            : [{ ...emptyPrinter }],
+        );
+
+        setInternetConnections(
+          data.internetConnections?.length
+            ? data.internetConnections.map(({ _id, ...connection }) => ({
+                ...connection,
+              }))
+            : [{ ...emptyConn }],
+        );
+
+        setCamera({
+          recordingStatus: data.camera?.recordingStatus || "Ok",
+          dvrBrand: data.camera?.dvrBrand || "",
+          remarks: data.camera?.remarks || "",
+        });
+
+        setGenerator({
+          installed: data.generator?.installed || false,
+          status: data.generator?.status || "N/A",
+          remarks: data.generator?.remarks || "",
+        });
+
+        setGoogleBusiness({
+          phoneNumberStatus: data.googleBusiness?.phoneNumberStatus || "Ok",
+          locationVerified: data.googleBusiness?.locationVerified ?? true,
+          businessHours: data.googleBusiness?.businessHours || "",
+          remarks: data.googleBusiness?.remarks || "",
+        });
+
+        setLoading(false);
+      })
+      .catch(() => {
+        setError("Failed to load branch.");
+        setLoading(false);
       });
-      setGenerator({
-        installed: data.generator?.installed || false,
-        status: data.generator?.status || "N/A",
-        remarks: data.generator?.remarks || "",
-      });
-      setGoogleBusiness({
-        phoneNumberStatus: data.googleBusiness?.phoneNumberStatus || "Ok",
-        locationVerified: data.googleBusiness?.locationVerified ?? true,
-        businessHours: data.googleBusiness?.businessHours || "",
-        remarks: data.googleBusiness?.remarks || "",
-      });
-      setLoading(false);
-    });
-  }, [id, isEdit]);
+  }, [id, isCopy]);
 
   const updateArrItem = (setter, idx, key, value) =>
     setter((arr) =>
@@ -181,9 +251,17 @@ export default function BranchForm() {
       googleBusiness,
     };
     try {
+      // if (isEdit) {
+      //   await api.put(`/branches/${id}`, payload);
+      // } else {
+      //   await api.post("/branches", payload);
+      // }
+
       if (isEdit) {
+        // Normal Edit
         await api.put(`/branches/${id}`, payload);
       } else {
+        // Add OR Copy
         await api.post("/branches", payload);
       }
       navigate("/branches");
@@ -202,14 +280,23 @@ export default function BranchForm() {
         <Link to="/branches" className="p-2 rounded-lg hover:bg-slate-200/60">
           <ArrowLeft size={18} />
         </Link>
-        <div>
+        {/* <div>
           <h1 className="text-2xl font-bold text-ink-900">
             {isEdit ? "Edit Branch" : "Add Branch"}
           </h1>
           <p className="text-slate-500 text-sm">
             Enter every system installed at this branch
           </p>
-        </div>
+        </div> */}
+
+        <h1 className="text-2xl font-bold text-ink-900">
+          {isCopy ? "Copy Branch" : isEdit ? "Edit Branch" : "Add Branch"}
+          <p className="text-slate-500 text-sm">
+            {isCopy
+              ? "Create a new branch using the existing branch details"
+              : "Enter every system installed at this branch"}
+          </p>
+        </h1>
       </div>
 
       {error && (
@@ -254,19 +341,7 @@ export default function BranchForm() {
           </div>
         </Section>
 
-        <Section
-          icon={MonitorSmartphone}
-          title="POS / Kitchen Stations"
-          // action={
-          //   <button
-          //     type="button"
-          //     onClick={() => setStations((s) => [...s, { ...emptyStation }])}
-          //     className="flex items-center gap-1 text-sm font-semibold text-brand-600 hover:text-brand-700"
-          //   >
-          //     <Plus size={15} /> Add Station
-          //   </button>
-          // }
-        >
+        <Section icon={MonitorSmartphone} title="POS / Kitchen Stations">
           <div className="space-y-4">
             {stations.map((s, idx) => (
               <div
@@ -400,19 +475,7 @@ export default function BranchForm() {
           </div>
         </Section>
 
-        <Section
-          icon={Printer}
-          title="Printers"
-          // action={
-          //   <button
-          //     type="button"
-          //     onClick={() => setPrinters((p) => [...p, { ...emptyPrinter }])}
-          //     className="flex items-center gap-1 text-sm font-semibold text-brand-600 hover:text-brand-700"
-          //   >
-          //     <Plus size={15} /> Add Printer
-          //   </button>
-          // }
-        >
+        <Section icon={Printer} title="Printers">
           <div className="space-y-4">
             {printers.map((p, idx) => (
               <div
@@ -486,21 +549,7 @@ export default function BranchForm() {
           </div>
         </Section>
 
-        <Section
-          icon={Wifi}
-          title="Internet Connections"
-          // action={
-          //   <button
-          //     type="button"
-          //     onClick={() =>
-          //       setInternetConnections((c) => [...c, { ...emptyConn }])
-          //     }
-          //     className="flex items-center gap-1 text-sm font-semibold text-brand-600 hover:text-brand-700"
-          //   >
-          //     <Plus size={15} /> Add Connection
-          //   </button>
-          // }
-        >
+        <Section icon={Wifi} title="Internet Connections">
           <div className="space-y-4">
             {internetConnections.map((c, idx) => (
               <div
@@ -607,7 +656,7 @@ export default function BranchForm() {
           </div>
           <div className="mt-3 border-slate-200 pt-3 flex justify-end">
             <button
-             type="button"
+              type="button"
               onClick={() =>
                 setInternetConnections((c) => [...c, { ...emptyConn }])
               }
